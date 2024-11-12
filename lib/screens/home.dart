@@ -1,10 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobprog_home/widgets/bar%20graph/bar_graph.dart';
 import 'package:mobprog_home/widgets/home_carousel.dart';
 import 'package:mobprog_home/constants.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final user = FirebaseAuth.instance.currentUser;
+
+  signout() async {
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +40,9 @@ class MyHomePage extends StatelessWidget {
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 10, left: 10),
-                    child: const Text(
-                      Constants.carText,
-                      style: TextStyle(
+                    child: Text(
+                      '${user!.email}',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -149,6 +161,10 @@ class MyHomePage extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (() => signout()),
+        child: const Icon(Icons.login_rounded),
+      ),
     );
   }
 }
@@ -171,3 +187,31 @@ class _BarGraphState extends State<BarGraph> {
     );
   }
 }
+
+// class Test extends StatefulWidget {
+//   const Test({super.key});
+
+//   @override
+//   State<Test> createState() => _TestState();
+// }
+
+// class _TestState extends State<Test> {
+//   final user = FirebaseAuth.instance.currentUser;
+
+//   signout() async {
+//     await FirebaseAuth.instance.signOut();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Center(
+//         child: Text('${user!.email}'),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         onPressed: (() => signout()),
+//         child: const Icon(Icons.login_rounded),
+//       ),
+//     );
+//   }
+// }
