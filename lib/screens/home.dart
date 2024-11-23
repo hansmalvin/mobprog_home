@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mobprog_home/navigation_provider.dart';
 import 'package:mobprog_home/widgets/bar%20graph/bar_graph.dart';
+import 'package:mobprog_home/widgets/drawer_item.dart';
+import 'package:mobprog_home/widgets/drawer_items.dart';
 import 'package:mobprog_home/widgets/home_carousel.dart';
 import 'package:mobprog_home/constants.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -200,6 +204,7 @@ class _HomeTestState extends State<HomeTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: NavigationDrawerWidget(),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -258,4 +263,181 @@ class _HomeTestState extends State<HomeTest> {
       ),
     );
   }
+}
+
+class NavigationDrawerWidget extends StatelessWidget {
+  const NavigationDrawerWidget({super.key});
+  final EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 20);
+
+  @override
+  Widget build(BuildContext context) {
+    final EdgeInsets spaceArea =
+        EdgeInsets.only(top: MediaQuery.of(context).viewPadding.top);
+
+    final provider = Provider.of<NavigationProvider>(context);
+    final isExpanded = provider.isExpanded;
+
+    return Container(
+      width: isExpanded ? MediaQuery.of(context).size.width * 0.2 : null,
+      child: Drawer(
+        child: Container(
+          color: const Color(0xff1a2f45),
+          child: Column(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24).add(spaceArea),
+                width: double.infinity,
+                color: Colors.white12,
+                child: buildHeader(isExpanded),
+              ),
+              const SizedBox(height: 24),
+              buildList(items: itemsFirst, isExpanded: isExpanded),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white70),
+              const SizedBox(height: 24),
+              buildList(
+                  indexOffset: itemsFirst.length,
+                  items: itemsSecond,
+                  isExpanded: isExpanded),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white70),
+              const SizedBox(height: 24),
+              buildList(
+                  indexOffset: itemsSecond.length,
+                  items: itemsSecond,
+                  isExpanded: isExpanded),
+              const Spacer(),
+              buildCollapseIcon(context, isExpanded),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildList(
+          {required bool isExpanded,
+          required List<DrawerItem> items,
+          int indexOffset = 0}) =>
+      ListView.separated(
+        padding: isExpanded ? EdgeInsets.zero : padding,
+        shrinkWrap: true,
+        primary: true,
+        itemCount: items.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          final item = items[index];
+
+          return buildMenuItem(
+            isExpanded: isExpanded,
+            text: item.title,
+            icon: item.icon,
+            onClicked: () => selectItem(context, indexOffset + index),
+          );
+        },
+      );
+
+  void selectItem(BuildContext context, int index) {
+    navigateTo(page) => Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => page),
+        );
+
+    Navigator.of(context).pop();
+
+    switch (index) {
+      case 0:
+        navigateTo(const HomeTest());
+        break;
+      case 1:
+        navigateTo(const HomeTest());
+        break;
+      case 2:
+        navigateTo(const HomeTest());
+        break;
+      case 3:
+        navigateTo(const HomeTest());
+        break;
+      case 4:
+        navigateTo(const HomeTest());
+        break;
+      case 5:
+        navigateTo(const HomeTest());
+        break;
+      case 6:
+        navigateTo(const HomeTest());
+        // masukkin logika logout dari fungsi yang udah ada
+        break;
+    }
+  }
+
+  Widget buildMenuItem({
+    required bool isExpanded,
+    required String text,
+    required IconData icon,
+    VoidCallback? onClicked,
+  }) {
+    const color = Colors.white;
+    final leading = Icon(icon, color: color);
+
+    return Material(
+      color: Colors.transparent,
+      child: isExpanded
+          ? ListTile(title: leading, onTap: onClicked)
+          : ListTile(
+              leading: leading,
+              title: Text(
+                text,
+                style: const TextStyle(color: color, fontSize: 16),
+              ),
+              onTap: onClicked,
+            ),
+    );
+  }
+
+  Widget buildCollapseIcon(BuildContext context, bool isExpanded) {
+    const double size = 52;
+    final icon = isExpanded ? Icons.arrow_forward_ios : Icons.arrow_back_ios;
+    final alignment = isExpanded ? Alignment.center : Alignment.centerRight;
+    final margin = isExpanded ? null : const EdgeInsets.only(right: 16);
+    final width = isExpanded ? double.infinity : size;
+
+    return Container(
+      alignment: alignment,
+      margin: margin,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          child: Container(
+            width: width,
+            height: size,
+            child: Icon(icon),
+          ),
+          onTap: () {
+            final provider =
+                Provider.of<NavigationProvider>(context, listen: false);
+
+            provider.toggleExpanded();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildHeader(bool isExpanded) => isExpanded
+      ? const FlutterLogo(size: 48)
+      : const Row(
+          children: [
+            SizedBox(width: 24),
+            FlutterLogo(
+              size: 48,
+            ),
+            SizedBox(width: 16),
+            Text(
+              'GacorTask',
+              style: TextStyle(fontSize: 32, color: Colors.white),
+            ),
+          ],
+        );
 }
